@@ -1,0 +1,25 @@
+body {
+    margin: 0;
+}
+body iframe {
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+    /* position: absolute; */
+    z-index: -1;
+    /* left: 0; */
+}
+.content {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+}
+#app {
+    line-height: 0;
+}
+.bc-image {
+    height: 100%;
+    background-size: 310px;
+    background-repeat: repeat;
+  }
