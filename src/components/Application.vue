@@ -75,6 +75,7 @@
           <transition name="component-fade">
             <div v-show="showCharacters" class="chinese-content mt-10">
               <Question
+                :ref="`question-${character.type}`"
                 v-for="(character) in characters"
                 :key="character.type"
                 :char="character"
@@ -178,7 +179,6 @@ export default {
       });
       this.characters.forEach((item, index) => {
         if (item.type === 1) {
-          item.highlight = true;
           if (index === 0) {
             item.class = "clicked-left";
             this.characters[1].class = "move-left";
@@ -192,68 +192,87 @@ export default {
             this.characters[0].class = "move-left";
             this.characters[1].class = "move-right";
           }
-          this.$store.state.sounds.highlight.play();
+          this.$refs[`question-${item.type}`][0].showIncorrectHints(
+            item.correct,
+            true
+          );
+          this.$refs[
+            `question-${item.type}`
+          ][0].$refs.videoelement.onended = () => {
+            setTimeout(() => {
+              this.$refs[`question-${item.type}`][0].showMotion = false;
+              this.showAnswerTips = false;
+              this.characters.forEach((item, index) => {
+                if (item.type === 3) {
+                  // item.highlight = true;
+                  if (index === 0) {
+                    item.class = "clicked-left";
+                    this.characters[1].class = "move-left";
+                    this.characters[2].class = "move-right";
+                  } else if (index === 1) {
+                    item.class = "clicked-center";
+                    this.characters[0].class = "move-left";
+                    this.characters[2].class = "move-right";
+                  } else if (index === 2) {
+                    item.class = "clicked-right";
+                    this.characters[0].class = "move-left";
+                    this.characters[1].class = "move-right";
+                  }
+                  // this.$store.state.sounds.highlight.play();
+                  this.$refs[`question-${item.type}`][0].showIncorrectHints(
+                    item.correct,
+                    true
+                  );
+                  this.$refs[
+                    `question-${item.type}`
+                  ][0].$refs.videoelement.onended = () => {
+                    setTimeout(() => {
+                      this.$refs[`question-${item.type}`][0].showMotion = false;
+                      this.showAnswerTips = false;
+                      this.characters.forEach((item, index) => {
+                        if (item.type === 2) {
+                          item.highlight = true;
+                          if (index === 0) {
+                            item.class = "clicked-left";
+                            this.characters[1].class = "move-left";
+                            this.characters[2].class = "move-right";
+                          } else if (index === 1) {
+                            item.class = "clicked-center";
+                            this.characters[0].class = "move-left";
+                            this.characters[2].class = "move-right";
+                          } else if (index === 2) {
+                            item.class = "clicked-right";
+                            this.characters[0].class = "move-left";
+                            this.characters[1].class = "move-right";
+                          }
+                          this.$store.state.sounds.highlight.play();
+                          setTimeout(() => {
+                            this.showingTipsTrains = false;
+                            item.highlight = false;
+                          }, 2000);
+                        } else {
+                          item.highlight = false;
+                        }
+                      });
+                      setTimeout(() => {
+                        this.characters.map(item => {
+                          item.class = "";
+                          item.clicked = false;
+                          item.highlight = false;
+                        });
+                      }, 3000);
+                    }, 2000);
+                  };
+                } else {
+                  item.highlight = false;
+                }
+              });
+            }, 2000);
+          };
         } else {
           item.highlight = false;
         }
       });
-      setTimeout(() => {
-        this.characters.forEach((item, index) => {
-          if (item.type === 3) {
-            item.highlight = true;
-            if (index === 0) {
-              item.class = "clicked-left";
-              this.characters[1].class = "move-left";
-              this.characters[2].class = "move-right";
-            } else if (index === 1) {
-              item.class = "clicked-center";
-              this.characters[0].class = "move-left";
-              this.characters[2].class = "move-right";
-            } else if (index === 2) {
-              item.class = "clicked-right";
-              this.characters[0].class = "move-left";
-              this.characters[1].class = "move-right";
-            }
-            this.$store.state.sounds.highlight.play();
-          } else {
-            item.highlight = false;
-          }
-        });
-        setTimeout(() => {
-          this.characters.forEach((item, index) => {
-            if (item.type === 2) {
-              item.highlight = true;
-              if (index === 0) {
-                item.class = "clicked-left";
-                this.characters[1].class = "move-left";
-                this.characters[2].class = "move-right";
-              } else if (index === 1) {
-                item.class = "clicked-center";
-                this.characters[0].class = "move-left";
-                this.characters[2].class = "move-right";
-              } else if (index === 2) {
-                item.class = "clicked-right";
-                this.characters[0].class = "move-left";
-                this.characters[1].class = "move-right";
-              }
-              this.$store.state.sounds.highlight.play();
-              setTimeout(() => {
-                this.showingTipsTrains = false;
-                item.highlight = false;
-              }, 2000);
-            } else {
-              item.highlight = false;
-            }
-          });
-          setTimeout(() => {
-            this.characters.map(item => {
-              item.class = "";
-              item.clicked = false;
-              item.highlight = false;
-            });
-          }, 3000);
-        }, 3000);
-      }, 3000);
     },
     restPostion() {
       this.showingTipsTrains = false;

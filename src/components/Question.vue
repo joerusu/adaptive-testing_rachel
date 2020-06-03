@@ -78,7 +78,7 @@ export default {
         }
       });
     },
-    showIncorrectHints(isCorrect) {
+    showIncorrectHints(isCorrect, callFromParent = false) {
       if (!isCorrect && !this.showMotion) {
         this.$emit("motionRunning");
         setTimeout(() => {
@@ -93,13 +93,17 @@ export default {
               this.$store.state.sounds.suggestion.onended = () => {
                 this.showMotion = true;
                 this.$refs.videoelement.play();
-                setTimeout(() => {
-                  this.$refs.videoelement.onended = () => {
-                    setTimeout(() => {
-                      this.$emit("restPostion");
-                    }, 1000);
-                  };
-                }, 1000);
+                if (!callFromParent) {
+                  setTimeout(() => {
+                    this.$refs.videoelement.onended = () => {
+                      if (!callFromParent) {
+                        setTimeout(() => {
+                          this.$emit("restPostion");
+                        }, 1000);
+                      }
+                    };
+                  }, 1000);
+                }
               };
             }, 500);
           }, 3000);
